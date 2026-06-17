@@ -1,0 +1,38 @@
+@page
+@model ForumApp.Pages.Posts.CreateModel
+@{
+    ViewData["Title"] = "Създай нова тема";
+}
+
+<div class="row justify-content-center mt-5 mb-5">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm border-0 rounded-4 p-4 p-md-5" style="background-color: #f9fafb;">
+            <h2 class="fw-bold mb-4" style="color: #4f46e5;">Създаване на дискусия</h2>
+            
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                
+                <div class="mb-4">
+                    <label asp-for="NewPost.Title" class="form-label fw-bold">Заглавие на темата</label>
+                    <input asp-for="NewPost.Title" class="form-control form-control-lg rounded-3" placeholder="Напишете ясно и точно заглавие..." />
+                    <span asp-validation-for="NewPost.Title" class="text-danger small"></span>
+                </div>
+                
+                <div class="mb-4">
+                    <label asp-for="NewPost.Content" class="form-label fw-bold">Съдържание</label>
+                    <textarea asp-for="NewPost.Content" class="form-control rounded-3" rows="6" placeholder="Опишете вашата идея или въпрос тук..."></textarea>
+                    <span asp-validation-for="NewPost.Content" class="text-danger small"></span>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mt-5">
+                    <a asp-page="/Index" class="text-muted text-decoration-none">Отказ</a>
+                    <button type="submit" class="btn btn-lg text-white rounded-pill px-5 shadow-sm" style="background-color: #4f46e5;">Публикувай</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

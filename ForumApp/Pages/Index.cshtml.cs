@@ -1,19 +1,27 @@
-using Microsoft.AspNetCore.Mvc;
+using ForumApp.Data;
+using ForumApp.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 
 namespace ForumApp.Pages;
 
 public class IndexModel : PageModel
 {
-    private readonly ILogger<IndexModel> _logger;
+    private readonly ApplicationDbContext _context;
 
-    public IndexModel(ILogger<IndexModel> logger)
+    public IndexModel(ApplicationDbContext context)
     {
-        _logger = logger;
+        _context = context;
     }
 
-    public void OnGet()
-    {
+    public IList<Post> Posts { get; set; } = new List<Post>();
 
+    public async Task OnGetAsync()
+    {
+        Posts = await _context.Posts
+            .Include(p => p.Author)
+            .Include(p => p.Comments)
+            .OrderByDescending(p => p.CreatedAt)
+            .ToListAsync();
     }
 }
