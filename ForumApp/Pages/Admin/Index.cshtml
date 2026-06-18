@@ -16,14 +16,8 @@
                         <button class="nav-link active text-start fw-bold mb-2 rounded-3" id="v-pills-stats-tab" data-bs-toggle="pill" data-bs-target="#v-pills-stats" type="button" role="tab" aria-controls="v-pills-stats" aria-selected="true">
                             📊 Статистика
                         </button>
-                        <button class="nav-link text-start fw-bold mb-2 rounded-3" id="v-pills-posts-tab" data-bs-toggle="pill" data-bs-target="#v-pills-posts" type="button" role="tab" aria-controls="v-pills-posts" aria-selected="false">
-                            📝 Управление на Теми
-                        </button>
-                        <button class="nav-link text-start fw-bold mb-2 rounded-3" id="v-pills-comments-tab" data-bs-toggle="pill" data-bs-target="#v-pills-comments" type="button" role="tab" aria-controls="v-pills-comments" aria-selected="false">
-                            🛡️ Модерация на Коментари
-                        </button>
                         <button class="nav-link text-start fw-bold rounded-3" id="v-pills-users-tab" data-bs-toggle="pill" data-bs-target="#v-pills-users" type="button" role="tab" aria-controls="v-pills-users" aria-selected="false">
-                            👥 Потребители
+                            👥 Управление на потребители
                         </button>
                     </div>
                 </div>
@@ -40,75 +34,74 @@
                                 <div class="col-md-4">
                                     <div class="border rounded-3 p-3 text-center bg-light">
                                         <h3 class="fw-bold text-dark mb-0">@Model.TotalUsers</h3>
-                                        <small class="text-muted text-uppercase fw-bold" style="font-size: 0.75rem;">Потребители</small>
+                                        <small class="text-muted text-uppercase fw-bold" style="font-size: 0.75rem;">Регистрирани</small>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
-                                    <div class="border rounded-3 p-3 text-center bg-light">
-                                        <h3 class="fw-bold text-dark mb-0">@Model.TotalPosts</h3>
-                                        <small class="text-muted text-uppercase fw-bold" style="font-size: 0.75rem;">Теми</small>
+                                    <div class="border rounded-3 p-3 text-center bg-light border-success">
+                                        <h3 class="fw-bold text-success mb-0">@Model.ActiveUsers</h3>
+                                        <small class="text-success text-uppercase fw-bold" style="font-size: 0.75rem;">Активни</small>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
-                                    <div class="border rounded-3 p-3 text-center bg-light border-danger">
-                                        <h3 class="fw-bold text-danger mb-0">@Model.PendingComments</h3>
-                                        <small class="text-danger text-uppercase fw-bold" style="font-size: 0.75rem;">Чакащи модерация</small>
+                                    <div class="border rounded-3 p-3 text-center bg-light border-primary">
+                                        <h3 class="fw-bold text-primary mb-0">@Model.ModeratorsCount</h3>
+                                        <small class="text-primary text-uppercase fw-bold" style="font-size: 0.75rem;">Модератори</small>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="tab-pane fade" id="v-pills-posts" role="tabpanel" aria-labelledby="v-pills-posts-tab">
-                            <h4 class="fw-bold mb-4" style="color: #4f46e5;">Управление на теми</h4>
-                            
-                            @if (Model.AllPosts.Count == 0)
-                            {
-                                <div class="alert bg-light text-center py-4 rounded-4 border-0 text-muted">
-                                    Все още няма създадени теми в системата.
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="table-responsive bg-white rounded-4 border">
-                                    <table class="table table-hover align-middle mb-0">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th class="ps-4">Заглавие</th>
-                                                <th>Автор</th>
-                                                <th>Дата</th>
-                                                <th class="text-end pe-4">Действия</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var post in Model.AllPosts)
-                                            {
-                                                <tr>
-                                                    <td class="ps-4 fw-bold">
-                                                        <a asp-page="/Posts/Details" asp-route-id="@post.Id" class="text-decoration-none text-dark" target="_blank" title="Преглед на темата">@post.Title</a>
-                                                    </td>
-                                                    <td>@(post.Author?.UserName?.Split('@')[0] ?? "Неизвестен")</td>
-                                                    <td><small class="text-muted">@post.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</small></td>
-                                                    <td class="text-end pe-4">
-                                                        <form method="post" asp-page-handler="DeletePost" asp-route-id="@post.Id" class="d-inline" onsubmit="return confirm('Сигурни ли сте, че искате да изтриете тази тема? Всички коментари към нея също ще бъдат изтрити.');">
-                                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">Изтрий</button>
-                                                        </form>
-                                                    </td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                </div>
-                            }
-                        </div>
-
-                        <div class="tab-pane fade" id="v-pills-comments" role="tabpanel" aria-labelledby="v-pills-comments-tab">
-                            <h4 class="fw-bold mb-4" style="color: #4f46e5;">Модерация на коментари</h4>
-                            <p class="text-muted">Тук ще заредим списък с всички коментари, със специален фокус върху тези, които ML моделът е маркирал като груби.</p>
-                        </div>
-
                         <div class="tab-pane fade" id="v-pills-users" role="tabpanel" aria-labelledby="v-pills-users-tab">
-                            <h4 class="fw-bold mb-4" style="color: #4f46e5;">Потребители</h4>
-                            <p class="text-muted">Тук ще управляваме акаунтите (активиране/деактивиране).</p>
+                            <h4 class="fw-bold mb-4" style="color: #4f46e5;">Управление на акаунти</h4>
+                            
+                            <div class="table-responsive rounded-4 border">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="ps-4">Потребител (Имейл)</th>
+                                            <th>Роля</th>
+                                            <th>Статус</th>
+                                            <th class="text-end pe-4">Действия</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var user in Model.UsersList)
+                                        {
+                                            <tr>
+                                                <td class="ps-4 fw-bold">@user.Email</td>
+                                                <td>
+                                                    @if (user.Roles.Contains("Admin")) { <span class="badge bg-danger">Админ</span> }
+                                                    else if (user.Roles.Contains("Moderator")) { <span class="badge bg-primary">Модератор</span> }
+                                                    else { <span class="badge bg-secondary">Потребител</span> }
+                                                </td>
+                                                <td>
+                                                    @if (user.IsActive) { <span class="badge bg-success bg-opacity-10 text-success border border-success">Активен</span> }
+                                                    else { <span class="badge bg-danger bg-opacity-10 text-danger border border-danger">Блокиран</span> }
+                                                </td>
+                                                <td class="text-end pe-4">
+                                                    @if (user.Email != User.Identity?.Name)
+                                                    {
+                                                        <form method="post" class="d-inline">
+                                                            <button type="submit" asp-page-handler="ToggleModerator" asp-route-id="@user.Id" class="btn btn-sm @(user.Roles.Contains("Moderator") ? "btn-outline-secondary" : "btn-outline-primary") rounded-pill px-3 me-1">
+                                                                @(user.Roles.Contains("Moderator") ? "Премахни Модератор" : "Направи Модератор")
+                                                            </button>
+                                                            
+                                                            <button type="submit" asp-page-handler="ToggleStatus" asp-route-id="@user.Id" class="btn btn-sm @(user.IsActive ? "btn-outline-danger" : "btn-outline-success") rounded-pill px-3">
+                                                                @(user.IsActive ? "Деактивирай" : "Активирай")
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted small">Вашият профил</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
                     </div>

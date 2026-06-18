@@ -1,7 +1,7 @@
 @page "{id:int}"
 @model ForumApp.Pages.Posts.DetailsModel
 @{
-    ViewData["Title"] = Model.Post.Title;
+    ViewData["Title"] = Model.Post?.Title ?? "Тема";
 }
 
 <div class="container mt-5 mb-5">
@@ -11,29 +11,39 @@
                 <div class="d-flex align-items-center">
                     <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 42px; height: 42px;">
                         <span class="fw-bold fs-6" style="color: #4f46e5;">
-                            @(Model.Post.Author?.UserName?.Substring(0, 1).ToUpper() ?? "?")
+                            @(Model.Post?.Author?.UserName?.Substring(0, 1).ToUpper() ?? "?")
                         </span>
                     </div>
                     <div>
-                        <h6 class="mb-0 fw-bold">@(Model.Post.Author?.UserName?.Split('@')[0] ?? "Неизвестен")</h6>
-                        <small class="text-muted">@Model.Post.CreatedAt.ToLocalTime().ToString("dd MMMM yyyy, HH:mm")</small>
+                        <h6 class="mb-0 fw-bold">
+                            @if (Model.Post?.Author != null && !Model.Post.Author.IsActive)
+                            {
+                                <span class="text-muted text-decoration-line-through">@(Model.Post.Author.UserName?.Split('@')[0] ?? "Неизвестен")</span>
+                                <span class="badge bg-secondary bg-opacity-25 text-secondary ms-1" style="font-size: 0.65rem;">banned</span>
+                            }
+                            else
+                            {
+                                <span class="text-dark">@(Model.Post?.Author?.UserName?.Split('@')[0] ?? "Неизвестен")</span>
+                            }
+                        </h6>
+                        <small class="text-muted">@(Model.Post?.CreatedAt.ToLocalTime().ToString("dd MMMM yyyy, HH:mm"))</small>
                     </div>
                 </div>
                 <a asp-page="/Index" class="btn btn-outline-secondary btn-sm rounded-pill px-3">Назад</a>
             </div>
             
-            <h1 class="fw-bold mb-4" style="color: #1f2937;">@Model.Post.Title</h1>
-            <p class="fs-5 lh-base text-body" style="white-space: pre-wrap;">@Model.Post.Content</p>
+            <h1 class="fw-bold mb-4" style="color: #1f2937;">@Model.Post?.Title</h1>
+            <p class="fs-5 lh-base text-body" style="white-space: pre-wrap;">@Model.Post?.Content</p>
         </div>
     </div>
 
     <div class="d-flex align-items-center mb-4">
         <h4 class="fw-bold m-0" style="color: #1f2937;">Коментари</h4>
-        <span class="badge rounded-pill ms-2" style="background-color: #4f46e5;">@Model.Comments.Count</span>
+        <span class="badge rounded-pill ms-2" style="background-color: #4f46e5;">@(Model.Comments?.Count ?? 0)</span>
     </div>
     
     <div class="row g-4 mb-5">
-        @if (Model.Comments.Count == 0)
+        @if (Model.Comments == null || Model.Comments.Count == 0)
         {
             <div class="col-12">
                 <div class="alert text-center py-4 rounded-4 shadow-sm border-0" style="background-color: #f9fafb;" role="alert">
@@ -49,7 +59,15 @@
                     <div class="card shadow-sm border-0 rounded-4" style="background-color: #f8fafc;">
                         <div class="card-body p-4">
                             <div class="d-flex align-items-center mb-2">
-                                <span class="fw-bold text-dark me-2">@(comment.Author?.UserName?.Split('@')[0] ?? "Неизвестен")</span>
+                                @if (comment.Author != null && !comment.Author.IsActive)
+                                {
+                                    <span class="fw-bold text-muted text-decoration-line-through me-2">@(comment.Author.UserName?.Split('@')[0] ?? "Неизвестен")</span>
+                                    <span class="badge bg-secondary bg-opacity-25 text-secondary me-2" style="font-size: 0.65rem;">banned</span>
+                                }
+                                else
+                                {
+                                    <span class="fw-bold text-dark me-2">@(comment.Author?.UserName?.Split('@')[0] ?? "Неизвестен")</span>
+                                }
                                 <span class="text-muted small">&bull; @comment.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
                             </div>
                             <p class="mb-0 text-body" style="white-space: pre-wrap;">@comment.Text</p>
@@ -80,7 +98,7 @@
                 <div class="alert alert-info rounded-3 mb-0 text-center border-0 bg-light">
                     <span class="text-muted">Трябва да влезете в профила си, за да можете да коментирате.</span>
                     <br/>
-                    <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="~/Posts/Details/@Model.Post.Id" class="fw-bold text-decoration-none mt-2 d-inline-block" style="color: #4f46e5;">Вход в системата</a>
+                    <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="~/Posts/Details/@(Model.Post?.Id)" class="fw-bold text-decoration-none mt-2 d-inline-block" style="color: #4f46e5;">Вход в системата</a>
                 </div>
             }
         </div>

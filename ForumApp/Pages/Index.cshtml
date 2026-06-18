@@ -6,26 +6,7 @@
 
 <div class="container my-4">
     <div class="rounded-4 shadow-lg text-white overflow-hidden" style="background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);">
-        <div class="row align-items-center py-5 px-4 px-lg-5">
-            @* <div class="col-lg-8 pe-lg-5">
-                <h1 class="display-4 fw-bold mb-4">Пространство за истински разговори</h1>
-                <p class="fs-5 mb-4 lh-base" style="color: rgba(255,255,255,0.85);">
-                    Присъедини се към общността. Споделяй идеи, обсъждай важните теми и намирай отговори. Нашата интелигентна модерация се грижи средата да остане чиста и освободена от токсичност.
-                </p>
-                <div class="d-flex flex-wrap gap-3 mt-4">
-                    @if (User.Identity?.IsAuthenticated == true)
-                    {
-                        <a asp-page="/Posts/Create" class="btn btn-light btn-lg px-4 fw-bold shadow-sm rounded-pill" style="color: #4f46e5;">Създай нова тема</a>
-                        <a href="#discussions" class="btn btn-outline-light btn-lg px-4 shadow-sm rounded-pill">Разгледай</a>
-                    }
-                    else
-                    {
-                        <a class="btn btn-light btn-lg px-4 fw-bold shadow-sm rounded-pill" style="color: #4f46e5;" asp-area="Identity" asp-page="/Account/Register">Присъедини се сега</a>
-                        <a class="btn btn-outline-light btn-lg px-4 shadow-sm rounded-pill" asp-area="Identity" asp-page="/Account/Login">Вход</a>
-                    }
-                </div>
-            </div> *@
-            
+        <div class="row align-items-center py-5 px-4 px-lg-5">            
             <div class="col-lg-8 pe-lg-5">
                 <h1 class="display-5 fw-bold mb-4">Автоматична модерация на съдържание</h1>
                 <p class="fs-5 mb-4 lh-base" style="color: rgba(255,255,255,0.85);">
@@ -87,7 +68,15 @@
                                     </span>
                                 </div>
                                 <span class="text-muted small">
-                                    <span class="fw-bold text-dark">@(post.Author?.UserName?.Split('@')[0] ?? "Неизвестен")</span>
+                                    @if (post.Author != null && !post.Author.IsActive)
+                                    {
+                                        <span class="fw-bold text-muted text-decoration-line-through">@(post.Author.UserName.Split('@')[0])</span>
+                                        <span class="badge bg-secondary bg-opacity-25 text-secondary ms-1" style="font-size: 0.65rem;">banned</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="fw-bold text-dark">@(post.Author?.UserName?.Split('@')[0] ?? "Неизвестен")</span>
+                                    }
                                     <span class="mx-1">&bull;</span>
                                     @post.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
                                 </span>

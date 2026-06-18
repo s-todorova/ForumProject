@@ -1,0 +1,66 @@
+@page
+@model ForumApp.Pages.Moderator.IndexModel
+@{
+    ViewData["Title"] = "Модераторски панел";
+}
+
+<div class="container mt-4 mb-5">
+    <div class="d-flex align-items-center mb-4 pb-2 border-bottom">
+        <h2 class="fw-bold m-0" style="color: #1f2937;">Опашка за модерация</h2>
+        <span class="badge bg-danger rounded-pill ms-3 px-3 py-2">Чакащи: @Model.PendingComments.Count</span>
+    </div>
+
+    @if (Model.PendingComments.Count == 0)
+    {
+        <div class="alert bg-white shadow-sm rounded-4 text-center py-5 border-0 text-success">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-check-circle mb-3 opacity-50" viewBox="0 0 16 16">
+              <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+              <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
+            </svg>
+            <h4 class="fw-bold">Опашката е празна!</h4>
+            <p class="mb-0">Няма коментари, които да изискват вашето внимание в момента.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var comment in Model.PendingComments)
+            {
+                <div class="col-12">
+                    <div class="card shadow-sm border-0 rounded-4 border-start border-4 border-warning bg-white">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                                <div>
+                                    <span class="text-muted small">Тема: </span>
+                                    <a asp-page="/Posts/Details" asp-route-id="@comment.PostId" class="fw-bold text-dark text-decoration-none" target="_blank">
+                                        @(comment.Post?.Title ?? "Неизвестна тема")
+                                    </a>
+                                </div>
+                                <div class="text-end">
+                                    <span class="text-muted small">Автор: </span>
+                                    <span class="fw-bold">@(comment.Author?.UserName?.Split('@')[0] ?? "Неизвестен")</span>
+                                    <br />
+                                    <small class="text-muted">@comment.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</small>
+                                </div>
+                            </div>
+
+                            <p class="fs-5 lh-base mb-4" style="white-space: pre-wrap;">@comment.Text</p>
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <form method="post" class="d-inline">
+                                    <button type="submit" asp-page-handler="Reject" asp-route-id="@comment.Id" class="btn btn-outline-danger rounded-pill px-4" title="Скрива коментара от публичен достъп">
+                                        Отхвърли (Груб език)
+                                    </button>
+                                    
+                                    <button type="submit" asp-page-handler="Approve" asp-route-id="@comment.Id" class="btn btn-success rounded-pill px-4 text-white shadow-sm">
+                                        Одобри (Позволи)
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
