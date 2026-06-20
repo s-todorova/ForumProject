@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.ComponentModel.DataAnnotations;
 using ForumApp.Data;
 using ForumApp.Models;
+using ForumApp.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -26,12 +27,19 @@ public class DetailsModel : PageModel
     private readonly ApplicationDbContext _context;
 
     /// <summary>
-    /// Инициализира нова инстанция на <see cref="DetailsModel"/> с посочения контекст на базата данни.
+    /// Услуга за ML-базирано модериране на коментари чрез NAS-BERT модел.
     /// </summary>
-    /// <param name="context">Контекст на базата данни, инжектиран чрез Dependency Injection.</param>
-    public DetailsModel(ApplicationDbContext context)
+    private readonly ICommentModerationService _moderationService;
+
+    /// <summary>
+    /// Инициализира нова инстанция на <see cref="DetailsModel"/>.
+    /// </summary>
+    /// <param name="context">Контекст на базата данни.</param>
+    /// <param name="moderationService">ML услуга за модериране на коментари.</param>
+    public DetailsModel(ApplicationDbContext context, ICommentModerationService moderationService)
     {
         _context = context;
+        _moderationService = moderationService;
     }
 
     /// <summary>
@@ -124,19 +132,10 @@ public class DetailsModel : PageModel
             return await OnGetAsync(id);
         }
 
-        // --- НАЧАЛО: Подготовка за ML модела ---
-        // По подразбиране приемаме, че коментарът е чист (Approved), за да се появи веднага
-        var calculatedStatus = CommentStatus.Approved;
-
-        // testing mock
-        var lowerText = NewCommentText.ToLower();
-        if (lowerText.Contains("глупак") || lowerText.Contains("идиот"))
-        {
-            calculatedStatus = CommentStatus.Pending;
-        }
-
-        // TODO: Тук NAS-BERT моделът ще презапише calculatedStatus
-        // ----------------------------------------
+        // ML класификация чрез NAS-BERT модел
+        var calculatedStatus = _moderationService.IsToxic(NewCommentText)
+            ? CommentStatus.Pending
+            : CommentStatus.Approved;
 
         var comment = new Comment
         {
