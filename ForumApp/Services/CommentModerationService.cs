@@ -92,12 +92,11 @@ namespace ForumApp.Services
             float score0 = output?.Score?.Length > 0 ? output.Score[0] : 0f;
             float score1 = output?.Score?.Length > 1 ? output.Score[1] : 0f;
 
-            // Изискваме Score[1] да е значително по-висок от Score[0]
-            // за да намалим false positives
-            bool mlToxic = score1 > score0 + 0.3f;
+            // bool mlToxic = score1 > score0 + 0.3f;
+            bool mlToxic = score1 > score0 +0.2f;
 
-            _logger.LogDebug("Коментарът е класифициран като {Label} (Score[0]={S0:F3}, Score[1]={S1:F3}).",
-                mlToxic ? "ТОКСИЧЕН" : "БЕЗОПАСЕН", score0, score1);
+            _logger.LogInformation(">>> ML АНАЛИЗ: Класифициран като {Label} (Score[0]={S0:F4}, Score[1]={S1:F4}) <<<",
+                mlToxic ? "ТОКСИЧЕН (Чакащ)" : "БЕЗОПАСЕН (Одобрен)", score0, score1);
 
             return mlToxic;
         }
