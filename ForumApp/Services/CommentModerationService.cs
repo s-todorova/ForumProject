@@ -93,7 +93,7 @@ namespace ForumApp.Services
             float score1 = output?.Score?.Length > 1 ? output.Score[1] : 0f;
 
             // bool mlToxic = score1 > score0 + 0.3f;
-            bool mlToxic = score1 > score0 +0.2f;
+            bool mlToxic = score1 > score0 +0.5f;
 
             _logger.LogInformation(">>> ML АНАЛИЗ: Класифициран като {Label} (Score[0]={S0:F4}, Score[1]={S1:F4}) <<<",
                 mlToxic ? "ТОКСИЧЕН (Чакащ)" : "БЕЗОПАСЕН (Одобрен)", score0, score1);
