@@ -24,7 +24,6 @@
 		<PackageReference Include="Microsoft.ML.TorchSharp" Version="0.22.0" />
 		<PackageReference Include="TorchSharp-cpu" Version="0.102.6" />
 	</ItemGroup>
-
 	<ItemGroup>
 		<Content Include="MLModels\SentimentAnalysis.zip">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
