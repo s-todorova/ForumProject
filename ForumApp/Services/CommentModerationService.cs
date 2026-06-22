@@ -62,13 +62,6 @@
 
             bool toxic = toxicEN || toxicBG;
 
-            _logger.LogInformation(
-                ">>> ФИНАЛЕН РЕЗУЛТАТ: '{Text}' → EN={EN} BG={BG} → {Label} <<<",
-                commentText,
-                toxicEN ? "ТОКСИЧЕН" : "БЕЗОПАСЕН",
-                toxicBG ? "ТОКСИЧЕН" : "БЕЗОПАСЕН",
-                toxic ? "ТОКСИЧЕН (Чакащ)" : "БЕЗОПАСЕН (Одобрен)");
-
             return toxic;
         }
     }

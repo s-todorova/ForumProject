@@ -6,6 +6,7 @@ using ForumApp.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace ForumApp.Pages.Posts;
 
@@ -25,21 +26,14 @@ public class DetailsModel : PageModel
     /// Контекст на базата данни за достъп до публикации и коментари.
     /// </summary>
     private readonly ApplicationDbContext _context;
-
-    /// <summary>
-    /// Услуга за ML-базирано модериране на коментари чрез NAS-BERT модел.
-    /// </summary>
     private readonly ICommentModerationService _moderationService;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    /// <summary>
-    /// Инициализира нова инстанция на <see cref="DetailsModel"/>.
-    /// </summary>
-    /// <param name="context">Контекст на базата данни.</param>
-    /// <param name="moderationService">ML услуга за модериране на коментари.</param>
-    public DetailsModel(ApplicationDbContext context, ICommentModerationService moderationService)
+    public DetailsModel(ApplicationDbContext context, ICommentModerationService moderationService, UserManager<ApplicationUser> userManager)
     {
         _context = context;
         _moderationService = moderationService;
+        _userManager = userManager;
     }
 
     /// <summary>
@@ -149,6 +143,30 @@ public class DetailsModel : PageModel
         _context.Comments.Add(comment);
         await _context.SaveChangesAsync();
 
+        TempData["CommentMessage"] = calculatedStatus == CommentStatus.Pending
+            ? "Коментарът ви е изпратен за преглед от модератор."
+            : "Коментарът ви е публикуван успешно.";
+        TempData["CommentMessageType"] = calculatedStatus == CommentStatus.Pending
+            ? "warning"
+            : "success";
+
         return RedirectToPage(new { id = id });
+    }
+
+    public async Task<IActionResult> OnPostDeleteAsync(int id)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var isAdmin = User.IsInRole("Admin");
+
+        var post = await _context.Posts.FindAsync(id);
+        if (post is null) return NotFound();
+
+        if (post.AuthorId != userId && !isAdmin)
+            return Forbid();
+
+        _context.Posts.Remove(post);
+        await _context.SaveChangesAsync();
+
+        return RedirectToPage("/Index");
     }
 }

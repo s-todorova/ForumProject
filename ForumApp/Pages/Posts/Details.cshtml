@@ -29,19 +29,37 @@
                         <small class="text-muted">@(Model.Post?.CreatedAt.ToLocalTime().ToString("dd MMMM yyyy, HH:mm"))</small>
                     </div>
                 </div>
-                <a asp-page="/Index" class="btn btn-outline-secondary btn-sm rounded-pill px-3">Назад</a>
+                <div class="d-flex gap-2">
+                    <a asp-page="/Index" class="btn btn-outline-secondary btn-sm rounded-pill px-3">Назад</a>
+                    @if (User.Identity?.IsAuthenticated == true &&
+                    (Model.Post?.AuthorId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value || User.IsInRole("Admin")))
+                    {
+                        <form method="post" asp-page-handler="Delete" asp-route-id="@Model.Post!.Id" class="d-inline"
+                              onsubmit="return confirm('Сигурни ли сте, че искате да изтриете тази тема?');">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3">Изтрий тема</button>
+                        </form>
+                    }
+                </div>
             </div>
-            
+
             <h1 class="fw-bold mb-4" style="color: #1f2937;">@Model.Post?.Title</h1>
             <p class="fs-5 lh-base text-body" style="white-space: pre-wrap;">@Model.Post?.Content</p>
         </div>
     </div>
 
+    @if (TempData["CommentMessage"] != null)
+    {
+        <div class="alert alert-@(TempData["CommentMessageType"] ?? "info") rounded-3 mb-4 border-0 shadow-sm" role="alert">
+            @TempData["CommentMessage"]
+        </div>
+    }
+
     <div class="d-flex align-items-center mb-4">
         <h4 class="fw-bold m-0" style="color: #1f2937;">Коментари</h4>
         <span class="badge rounded-pill ms-2" style="background-color: #4f46e5;">@(Model.Comments?.Count ?? 0)</span>
     </div>
-    
+
     <div class="row g-4 mb-5">
         @if (Model.Comments == null || Model.Comments.Count == 0)
         {
@@ -97,7 +115,7 @@
             {
                 <div class="alert alert-info rounded-3 mb-0 text-center border-0 bg-light">
                     <span class="text-muted">Трябва да влезете в профила си, за да можете да коментирате.</span>
-                    <br/>
+                    <br />
                     <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="~/Posts/Details/@(Model.Post?.Id)" class="fw-bold text-decoration-none mt-2 d-inline-block" style="color: #4f46e5;">Вход в системата</a>
                 </div>
             }
